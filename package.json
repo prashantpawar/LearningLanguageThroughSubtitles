@@ -1,0 +1,23 @@
+{
+  "name": "LearningLanguageThroughSubtitles",
+  "version": "0.0.1",
+  "description": "LearningLanguageThroughSubtitles ================================",
+  "main": "app.js",
+  "dependencies": {},
+  "devDependencies": {
+    "mysql": "^2.3.2"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://prashantpawar@github.com/prashantpawar/LearningLanguageThroughSubtitles.git"
+  },
+  "author": "Prashant Singh Pawar",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/prashantpawar/LearningLanguageThroughSubtitles/issues"
+  },
+  "homepage": "https://github.com/prashantpawar/LearningLanguageThroughSubtitles"
+}
