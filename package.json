@@ -3,9 +3,7 @@
   "version": "0.0.1",
   "description": "LearningLanguageThroughSubtitles ================================",
   "main": "app.js",
-  "dependencies": {
-    "line-by-line": "^0.1.1"
-  },
+  "dependencies": {},
   "devDependencies": {
     "mysql": "^2.3.2"
   },
