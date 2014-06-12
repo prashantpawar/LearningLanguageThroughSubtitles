@@ -6,46 +6,47 @@ modules.readline = require('readline');
 modules.stream = require('stream');
 modules.config = require('./config');
 modules.mysql = require('mysql');
-db = modules.config.db;
-connection = modules.mysql.createConnection({
-    host: db.host,
-    user: db.user,
-    password: db.password,
-    database: db.database
-});
+(function () {
+    var db = modules.config.db;
+    connection = modules.mysql.createConnection({
+        host: db.host,
+        user: db.user,
+        password: db.password,
+        database: db.database
+    });
 
-connection.connect();
-connection.query("SHOW TABLES;", function(err, rows) {
-    if(err) {
-        throw err;
-    } else {
-        console.log(rows);
-    }
+    connection.connect();
+    connection.query("SHOW TABLES;", function(err, rows) {
+        if(err) {
+            throw err;
+        } else {
+            console.log(rows);
+        }
+    });
+    connection.end();
 });
-connection.end();
 
 
 var en_stream = modules.fs.createReadStream(modules.config.data_file + "/en_sample.txt");
 var ru_stream = modules.fs.createReadStream(modules.config.data_file + "/ru_sample.txt");
 
-var r1 = modules.readline.createInterface({
+var en_rl = modules.readline.createInterface({
     input: en_stream,
     terminal: false
 });
-var r2 = modules.readline.createInterface({
+var ru_rl = modules.readline.createInterface({
     input: ru_stream,
     terminal: false
 });
 
-var r1_count = r2_count = 0;
-r1.on('line', function(line) {
-    console.log(line);
-    this.pause();
-    r2.resume();
+var en_rl_count = ru_rl_count = 0,
+    line_buffer = [];
+en_rl.on('line', function(line) {
+    obj = line_buffer[line_buffer.length - 1];
+    if(obj && obj.ru_text) {
+        console.log(obj);
+    }
 });
 
-r2.on('line', function(line) {
-    console.log(line);
-    this.pause();
-    r1.resume();
+ru_rl.on('line', function(line) {
 });
