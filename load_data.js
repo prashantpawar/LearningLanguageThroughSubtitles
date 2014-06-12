@@ -2,9 +2,9 @@ var modules = {},
     connection;
 
 modules.fs = require('fs');
-modules.readline = require('readline');
-modules.stream = require('stream');
+modules.xmlstream = require('xml-stream');
 modules.config = require('./config');
+modules.natural = require('natural');
 modules.mysql = require('mysql');
 (function () {
     var db = modules.config.db;
@@ -26,27 +26,27 @@ modules.mysql = require('mysql');
     connection.end();
 });
 
+var stream = modules.fs.createReadStream(modules.config.data_file + '/OpenSubtitles2013/en-ru.tmx');
+var xml = new modules.xmlstream(stream);
+var tokenizerRu = new modules.natural.AggressiveTokenizerRu();
+var tokenizer = new modules.natural.AggressiveTokenizer();
 
-var en_stream = modules.fs.createReadStream(modules.config.data_file + "/en_sample.txt");
-var ru_stream = modules.fs.createReadStream(modules.config.data_file + "/ru_sample.txt");
-
-var en_rl = modules.readline.createInterface({
-    input: en_stream,
-    terminal: false
-});
-var ru_rl = modules.readline.createInterface({
-    input: ru_stream,
-    terminal: false
-});
-
-var en_rl_count = ru_rl_count = 0,
-    line_buffer = [];
-en_rl.on('line', function(line) {
-    obj = line_buffer[line_buffer.length - 1];
-    if(obj && obj.ru_text) {
-        console.log(obj);
+xml.preserve('tu');
+xml.collect('tuv');
+var count = 0, text;
+xml.on('endElement: tu', function(tu) {
+    text = {};
+    text[tu.tuv[0].$['xml:lang']] = tu.tuv[0].seg.$text; 
+    text[tu.tuv[1].$['xml:lang']] = tu.tuv[1].seg.$text; 
+    /**
+    tu.tuv.forEach(function(item) {
+        console.log(item.seg.$text);
+    });
+    **/
+    console.log(text.ru, tokenizerRu.tokenize(text.ru).length);
+    console.log(text.en, tokenizer.tokenize(text.en).length);
+    //console.log(tu.tuv[1].seg.$text);
+    if(count++ > 200) {
+        process.exit();
     }
-});
-
-ru_rl.on('line', function(line) {
 });
