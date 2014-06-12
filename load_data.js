@@ -6,24 +6,12 @@ modules.xmlstream = require('xml-stream');
 modules.config = require('./config');
 modules.natural = require('natural');
 modules.mysql = require('mysql');
-(function () {
-    var db = modules.config.db;
-    connection = modules.mysql.createConnection({
-        host: db.host,
-        user: db.user,
-        password: db.password,
-        database: db.database
-    });
-
-    connection.connect();
-    connection.query("SHOW TABLES;", function(err, rows) {
-        if(err) {
-            throw err;
-        } else {
-            console.log(rows);
-        }
-    });
-    connection.end();
+var db = modules.config.db;
+connection = modules.mysql.createConnection({
+    host: db.host,
+    user: db.user,
+    password: db.password,
+    database: db.database
 });
 
 var stream = modules.fs.createReadStream(modules.config.data_file + '/OpenSubtitles2013/en-ru.tmx');
@@ -33,20 +21,22 @@ var tokenizer = new modules.natural.AggressiveTokenizer();
 
 xml.preserve('tu');
 xml.collect('tuv');
-var count = 0, text;
+var count = 0, query, query_data;
 xml.on('endElement: tu', function(tu) {
-    text = {};
-    text[tu.tuv[0].$['xml:lang']] = tu.tuv[0].seg.$text; 
-    text[tu.tuv[1].$['xml:lang']] = tu.tuv[1].seg.$text; 
-    /**
+    query_data = {};
     tu.tuv.forEach(function(item) {
-        console.log(item.seg.$text);
+        query_data[item.$['xml:lang']] = item.seg.$text;
     });
-    **/
-    console.log(text.ru, tokenizerRu.tokenize(text.ru).length);
-    console.log(text.en, tokenizer.tokenize(text.en).length);
-    //console.log(tu.tuv[1].seg.$text);
-    if(count++ > 200) {
-        process.exit();
-    }
+    query_data['ru_word_length'] = tokenizerRu.tokenize(query_data.ru).length; 
+    query_data['en_word_length'] = tokenizer.tokenize(query_data.en).length; 
+
+    xml.pause();
+    query = connection.query("INSERT INTO translation SET ?", query_data, function(err, rows) {
+        if(err) {
+            throw err;
+        } else {
+            xml.resume();
+            //console.log(rows);
+        }
+    });
 });
