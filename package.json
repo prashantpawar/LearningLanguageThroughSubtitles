@@ -4,7 +4,8 @@
   "description": "LearningLanguageThroughSubtitles ================================",
   "main": "app.js",
   "dependencies": {
-    "xml-stream": "^0.4.4"
+    "xml-stream": "^0.4.4",
+    "natural": "^0.1.27"
   },
   "devDependencies": {
     "mysql": "^2.3.2"

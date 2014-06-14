@@ -2,51 +2,41 @@ var modules = {},
     connection;
 
 modules.fs = require('fs');
-modules.readline = require('readline');
-modules.stream = require('stream');
+modules.xmlstream = require('xml-stream');
 modules.config = require('./config');
+modules.natural = require('natural');
 modules.mysql = require('mysql');
-(function () {
-    var db = modules.config.db;
-    connection = modules.mysql.createConnection({
-        host: db.host,
-        user: db.user,
-        password: db.password,
-        database: db.database
-    });
+var db = modules.config.db;
+connection = modules.mysql.createConnection({
+    host: db.host,
+    user: db.user,
+    password: db.password,
+    database: db.database
+});
 
-    connection.connect();
-    connection.query("SHOW TABLES;", function(err, rows) {
+var stream = modules.fs.createReadStream(modules.config.data_file + '/OpenSubtitles2013/en-ru.tmx');
+var xml = new modules.xmlstream(stream);
+var tokenizerRu = new modules.natural.AggressiveTokenizerRu();
+var tokenizer = new modules.natural.AggressiveTokenizer();
+
+xml.preserve('tu');
+xml.collect('tuv');
+var count = 0, query, query_data;
+xml.on('endElement: tu', function(tu) {
+    query_data = {};
+    tu.tuv.forEach(function(item) {
+        query_data[item.$['xml:lang']] = item.seg.$text;
+    });
+    query_data['ru_word_length'] = tokenizerRu.tokenize(query_data.ru).length; 
+    query_data['en_word_length'] = tokenizer.tokenize(query_data.en).length; 
+
+    xml.pause();
+    query = connection.query("INSERT INTO translation SET ?", query_data, function(err, rows) {
         if(err) {
             throw err;
         } else {
-            console.log(rows);
+            xml.resume();
+            //console.log(rows);
         }
     });
-    connection.end();
-});
-
-
-var en_stream = modules.fs.createReadStream(modules.config.data_file + "/en_sample.txt");
-var ru_stream = modules.fs.createReadStream(modules.config.data_file + "/ru_sample.txt");
-
-var en_rl = modules.readline.createInterface({
-    input: en_stream,
-    terminal: false
-});
-var ru_rl = modules.readline.createInterface({
-    input: ru_stream,
-    terminal: false
-});
-
-var en_rl_count = ru_rl_count = 0,
-    line_buffer = [];
-en_rl.on('line', function(line) {
-    obj = line_buffer[line_buffer.length - 1];
-    if(obj && obj.ru_text) {
-        console.log(obj);
-    }
-});
-
-ru_rl.on('line', function(line) {
 });
