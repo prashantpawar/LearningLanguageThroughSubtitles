@@ -1,3 +1,4 @@
+return;
 var modules = {},
     connection;
 
