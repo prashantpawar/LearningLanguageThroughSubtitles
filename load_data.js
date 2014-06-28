@@ -1,3 +1,4 @@
+return;
 var modules = {},
     connection;
 
@@ -36,7 +37,6 @@ xml.on('endElement: tu', function(tu) {
             throw err;
         } else {
             xml.resume();
-            //console.log(rows);
         }
     });
 });

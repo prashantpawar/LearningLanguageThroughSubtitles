@@ -5,7 +5,8 @@
   "main": "app.js",
   "dependencies": {
     "xml-stream": "^0.4.4",
-    "natural": "^0.1.27"
+    "natural": "^0.1.27",
+    "q": "^1.0.1"
   },
   "devDependencies": {
     "mysql": "^2.3.2"
