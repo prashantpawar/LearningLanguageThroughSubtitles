@@ -6,7 +6,8 @@
   "dependencies": {
     "xml-stream": "^0.4.4",
     "natural": "^0.1.27",
-    "q": "^1.0.1"
+    "q": "^1.0.1",
+    "async": "^0.9.0"
   },
   "devDependencies": {
     "mysql": "^2.3.2"
