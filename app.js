@@ -16,25 +16,6 @@ connection = m.mysql.createConnection({
 });
 
 
-/**
-connection.query(high_freq_query, function(err, rows, fields) {
-    if (err) throw err;
-
-    rows.forEach(function(row) {
-        connection.query(m.util.format(keyword_query, row.word), function (err, rows, field) {
-            if (err) throw err;
-
-            rows.forEach(function(row) {
-                console.log(row);
-            });
-        });
-    });
-    connection.end();
-});
-**/
-
-//connection.end();
-
 m.async.waterfall([
     function high_frequncy(callback) {
         var high_freq_query = "SELECT * FROM frequency_ru f WHERE f.id < 100 AND CHAR_LENGTH(f.word) > 3 ORDER BY RAND() LIMIT 25";
