@@ -24,14 +24,30 @@ m.async.waterfall([
         });
     },
     function fetch_translations(keywords, callback) {
-        var keyword_query = "SELECT * FROM translation t WHERE MATCH(t.ru) AGAINST('%s') AND ABS(t.en_word_length - t.ru_word_length) = 0 ORDER BY t.ru_word_length ASC LIMIT 20";
-        //console.log(m.util.format(keyword_query, keywords[0].word));
+        var keyword_query = "SELECT * FROM translation t WHERE MATCH(t.ru) AGAINST('%s') AND ABS(t.en_word_length - t.ru_word_length) = 0 AND t.ru_word_length < 5 LIMIT 20";
         connection.query(m.util.format(keyword_query, keywords[0].word), function (err, rows, field) {
             callback(err, rows);
         });
     }], 
-    function end_connection(err, result) {
-        console.log(result);
+    function display_quiz(err, result) {
+        var quizes = [], quiz = {};
+        var BreakException = {};
+        try {
+            result.forEach(function (row) {
+                if(!quiz.question) {
+                    quiz.question = row.ru;
+                    quiz.answer = row.en;
+                    quiz.options = [{ru: row.ru, en: row.en}];
+                } else if(quiz.options.length < 4) {
+                    quiz.options.push({ru:row.ru, en: row.en});
+                } else {
+                    throw BreakException;
+                }
+            });
+        }catch(e) {
+            if(e !== BreakException) throw e;
+        }
+        console.log(quiz);
         connection.end();
     }
 );
