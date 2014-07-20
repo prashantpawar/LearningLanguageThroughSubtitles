@@ -1,0 +1,10 @@
+{
+	"baseName": "LLTS",
+	"databaseType": "mysql",
+	"hostName": "localhost",
+	"databaseName": "LearningLanguageThroughSubtitles",
+	"userName": "root",
+	"password": "toVqX3c9at",
+	"entities": [],
+	"composer": false
+}
